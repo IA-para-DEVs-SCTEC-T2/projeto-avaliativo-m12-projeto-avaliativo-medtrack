@@ -11,5 +11,9 @@ export default {
 
   removeMedication(id) {
     return api.delete(`/user-medications/${id}`)
+  },
+
+  getInteractions(medicationId) {
+    return api.get(`/interactions/medication/${medicationId}`)
   }
 }
