@@ -121,3 +121,81 @@ Gere o InteractionAlertResponse record e ajuste o service para retornar neste fo
 | Email do JWT como identificador | Não expõe UUID interno na API |
 | Select de medicamentos | Evita erros de digitação, melhor UX |
 | Disclaimer obrigatório | Requisito legal — não é conselho médico |
+
+
+---
+
+## Ciclo 3 — MVP Funcional (Login, Cadastro, Header, Guards e Seed Admin)
+
+**Data:** 2026-05-27
+**Issue:** [#33 — feat: frontend MVP funcional + seed de admin](https://github.com/IA-para-DEVs-SCTEC-T2/projeto-avaliativo-medtrack/issues/33)
+**Padrão de prompting:** Role-based + Chain of Thought
+**Ferramenta:** Kiro
+
+### Contexto
+
+Após o primeiro ciclo, o frontend ficou com `LoginView`, `RegisterView` e `DashboardView` como stubs ("a ser implementada"). O usuário não tinha como autenticar pela UI, e não existia seed de admin no backend, embora `ADMIN_DEFAULT_PASSWORD` estivesse declarado no `.env`.
+
+### Prompt Inicial
+
+```
+Você é um desenvolvedor fullstack sênior em Spring Boot 3 + Vue 3 (Composition API).
+
+Implemente o frontend mínimo funcional do MedTrack para fechar o gap entre o backend
+pronto e a UI atual em estado de esqueleto. Mantenha as decisões de privacidade
+do projeto (sem PII além de e-mail) e o disclaimer médico obrigatório.
+
+Backend
+- AdminBootstrap (CommandLineRunner): cria um usuário ADMIN no primeiro start se nenhum
+  admin existir, lendo ADMIN_DEFAULT_EMAIL (default admin@medtrack.local) e
+  ADMIN_DEFAULT_PASSWORD do ambiente. Idempotente.
+- application.yml expõe app.admin.default-email e app.admin.default-password.
+
+Frontend
+- LoginView e RegisterView com formulários reativos, integração com authService,
+  exibição de erros e redirect pós-autenticação.
+- AppHeader com brand, navegação (Início, Meus medicamentos, Painel admin condicional)
+  e botão de logout. Renderizado apenas quando autenticado.
+- DashboardView com cards apontando para as áreas principais.
+- Pinia store auth.js: persiste token + email + role em localStorage e expõe
+  isAuthenticated/isAdmin. Centraliza login/register/logout.
+- Router: meta requiresAuth, requiresAdmin, guestOnly e guard global.
+- api.js com interceptor que injeta Bearer e desloga em 401.
+- Estilo unificado em assets/styles/main.css (tokens CSS, sem framework).
+
+Regras
+- Disclaimer visível em todas as telas relevantes (componente DisclaimerBanner).
+- Telas admin (ManageMedications/Interactions/Users + SystemConfig) usando os
+  endpoints existentes em /admin/**.
+- Nada de PII além de e-mail.
+```
+
+### Saída e ajustes
+
+A geração entregou o esqueleto correto. Ajustes manuais aplicados:
+
+| Item | Razão |
+|------|-------|
+| `api.js` — interceptor de 401 redireciona para `/login` apenas se já não estiver lá | Evitar loop de redirect na própria tela de login |
+| `auth.js` (store) — persistir `email` e `role` em `localStorage` | Sem isso, refresh perderia o estado e o guard `requiresAdmin` falharia |
+| `router/index.js` — guard checa `to.meta.guestOnly && isAuthenticated` | Evita usuário logado abrir `/login` ou `/register` |
+| `AddMedicationView` — listar medicamentos via `GET /medications` em vez de `/admin/medications` | Endpoint público (autenticado) — usuário comum não tem permissão no `/admin` |
+| `SystemConfigView` — wirar com `/admin/fda/status`, `/admin/fda/toggle` e `/admin/fda/test-connection` | Endpoints já existentes no backend; trocar mock estático |
+| `AdminBootstrap` — `if (defaultPassword == null \|\| isBlank())` | Não derrubar o boot quando a env não estiver definida (ex: ambiente de teste) |
+
+### Decisões técnicas
+
+| Decisão | Justificativa |
+|---------|---------------|
+| Guards no router (não em cada view) | Padrão Vue Router, ponto único de proteção |
+| Persistência em `localStorage` (não `sessionStorage`) | UX: usuário não relogar a cada aba |
+| Header fora do `<RouterView>` | Navegação consistente e evita re-render por rota |
+| Tokens CSS em `:root` (sem framework) | Manter o stack enxuto conforme `tech.md` (PrimeVue/Vuetify ainda não foram adicionados) |
+| Seed admin condicional via env | Permite ambientes (CI, testes) sem admin se a senha não for definida |
+
+### Avaliação crítica
+
+- **Aceito:** estrutura de auth, guards, persistência mínima, header com nav.
+- **Ajustado:** todos os pontos da tabela acima.
+- **Rejeitado:** sugestão da IA de adicionar refresh token rotation — fora do escopo
+  do MVP (registrado em `Melhorias Futuras` do README).
