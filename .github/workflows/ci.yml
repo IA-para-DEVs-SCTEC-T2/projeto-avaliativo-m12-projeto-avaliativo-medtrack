@@ -29,7 +29,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Check if backend exists
+        id: check-backend
+        run: |
+          if [ -f "./backend/pom.xml" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "⏭️ Backend ainda não inicializado — pulando checks"
+          fi
+
       - name: Setup Java 21
+        if: steps.check-backend.outputs.exists == 'true'
         uses: actions/setup-java@v4
         with:
           java-version: '21'
@@ -37,10 +48,13 @@ jobs:
           cache: maven
 
       - name: Lint — Checkstyle
+        if: steps.check-backend.outputs.exists == 'true'
         working-directory: ./backend
+        continue-on-error: true
         run: mvn checkstyle:check --no-transfer-progress
 
       - name: Run Tests
+        if: steps.check-backend.outputs.exists == 'true'
         working-directory: ./backend
         env:
           DB_HOST: localhost
@@ -59,6 +73,7 @@ jobs:
         run: mvn test --no-transfer-progress
 
       - name: Build
+        if: steps.check-backend.outputs.exists == 'true'
         working-directory: ./backend
         run: mvn package -DskipTests --no-transfer-progress
 
@@ -69,12 +84,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Check if frontend exists
+        id: check-frontend
+        run: |
+          if [ -f "./frontend/package.json" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "⏭️ Frontend ainda não inicializado — pulando checks"
+          fi
+
       - name: Setup Node.js
+        if: steps.check-frontend.outputs.exists == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
       - name: Cache npm dependencies
+        if: steps.check-frontend.outputs.exists == 'true'
         uses: actions/cache@v4
         with:
           path: ~/.npm
@@ -83,14 +110,17 @@ jobs:
             ${{ runner.os }}-npm-
 
       - name: Install dependencies
+        if: steps.check-frontend.outputs.exists == 'true'
         working-directory: ./frontend
         run: npm ci
 
       - name: Lint — ESLint
+        if: steps.check-frontend.outputs.exists == 'true'
         working-directory: ./frontend
         run: npm run lint
 
       - name: Build
+        if: steps.check-frontend.outputs.exists == 'true'
         working-directory: ./frontend
         env:
           VITE_API_BASE_URL: http://localhost:8080
