@@ -11,7 +11,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-medtrack_user}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-medtrack_user} -d ${DB_NAME:-medtrack}"]
       interval: 10s
       timeout: 5s
       retries: 5
