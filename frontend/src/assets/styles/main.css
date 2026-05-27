@@ -1,0 +1,171 @@
+:root {
+  --color-primary: #1e6091;
+  --color-primary-dark: #154a73;
+  --color-accent: #4caf50;
+  --color-bg: #f5f7fa;
+  --color-surface: #ffffff;
+  --color-text: #1f2933;
+  --color-text-muted: #52606d;
+  --color-border: #d8e1ec;
+  --color-danger: #c0392b;
+  --color-warning: #d97706;
+  --color-success: #2f855a;
+
+  --severity-mild: #f4d35e;
+  --severity-moderate: #f4a261;
+  --severity-severe: #e63946;
+
+  --radius: 8px;
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body, #app { height: 100%; }
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a { color: var(--color-primary); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+h1, h2, h3 { color: var(--color-text); margin-top: 0; }
+
+.app-shell {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.page {
+  flex: 1;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 3rem;
+}
+
+.disclaimer {
+  background: #fff8e1;
+  border-left: 4px solid var(--color-warning);
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  color: #78350f;
+  font-size: 0.95rem;
+  margin: 1rem 0 1.5rem;
+}
+
+.card {
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border);
+}
+
+.button {
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.65rem 1.1rem;
+  transition: background 0.15s ease;
+}
+.button:hover:not(:disabled) { background: var(--color-primary-dark); }
+.button:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.button.button-secondary { background: #fff; color: var(--color-primary); border: 1px solid var(--color-primary); }
+.button.button-secondary:hover:not(:disabled) { background: #eaf3fb; }
+
+.button.button-danger { background: var(--color-danger); }
+.button.button-danger:hover:not(:disabled) { background: #962c20; }
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+}
+
+.field label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+.field input,
+.field select,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="time"],
+select {
+  font: inherit;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--color-text);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+input:focus, select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(30, 96, 145, 0.15);
+}
+
+.alert {
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius);
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+}
+.alert-error { background: #fdecea; border-color: #f5b7b1; color: var(--color-danger); }
+.alert-success { background: #e8f5e9; border-color: #a5d6a7; color: var(--color-success); }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+thead { background: #eef2f7; }
+th, td { padding: 0.7rem 0.9rem; text-align: left; border-bottom: 1px solid var(--color-border); font-size: 0.95rem; }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover { background: #f8fafc; }
+
+.severity-mild { color: #8d6e00; font-weight: 600; }
+.severity-moderate { color: #b45309; font-weight: 600; }
+.severity-severe { color: #b91c1c; font-weight: 700; }
+
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  color: var(--color-text-muted);
+}
+
+.grid-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.medication-card .card-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}

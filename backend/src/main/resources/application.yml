@@ -40,6 +40,9 @@ app:
   jwt:
     secret: ${JWT_SECRET:bWVkdHJhY2stZGV2LXNlY3JldC1rZXktZm9yLWRldmVsb3BtZW50LW9ubHktY2hhbmdlLWluLXByb2R1Y3Rpb24=}
     expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+  admin:
+    default-email: ${ADMIN_DEFAULT_EMAIL:admin@medtrack.local}
+    default-password: ${ADMIN_DEFAULT_PASSWORD:}
 
 # FDA Integration
 fda:

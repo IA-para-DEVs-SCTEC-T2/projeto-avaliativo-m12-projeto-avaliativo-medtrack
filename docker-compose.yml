@@ -35,6 +35,7 @@ services:
       MAIL_USERNAME: ${MAIL_USERNAME}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
       FDA_API_BASE_URL: ${FDA_API_BASE_URL:-https://api.fda.gov}
+      ADMIN_DEFAULT_EMAIL: ${ADMIN_DEFAULT_EMAIL:-admin@medtrack.local}
       ADMIN_DEFAULT_PASSWORD: ${ADMIN_DEFAULT_PASSWORD}
     ports:
       - "8080:8080"

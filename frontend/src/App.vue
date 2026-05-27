@@ -1,17 +1,20 @@
 <script setup>
-import { RouterView } from 'vue-router'
+import { useRoute } from 'vue-router'
+import { computed } from 'vue'
+import { useAuthStore } from './stores/auth'
+import AppHeader from './components/layout/AppHeader.vue'
+
+const route = useRoute()
+const auth = useAuthStore()
+
+const showHeader = computed(() => auth.isAuthenticated && !route.meta.guestOnly)
 </script>
 
 <template>
-  <div id="app">
-    <RouterView />
+  <div class="app-shell">
+    <AppHeader v-if="showHeader" />
+    <main class="page">
+      <RouterView />
+    </main>
   </div>
 </template>
-
-<style>
-#app {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-</style>
