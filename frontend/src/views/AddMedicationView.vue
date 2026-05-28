@@ -12,7 +12,9 @@ const form = reactive({
   dosage: '',
   frequencyValue: '',
   frequencyUnit: 'DAILY',
-  reminderTime: ''
+  reminderTime: '',
+  startDate: new Date().toISOString().split('T')[0],
+  endDate: ''
 })
 const interactionAlert = ref(null)
 const loading = ref(false)
@@ -38,7 +40,9 @@ async function addMedication() {
       dosage: form.dosage || null,
       frequencyValue: form.frequencyValue ? Number(form.frequencyValue) : null,
       frequencyUnit: form.frequencyUnit || null,
-      reminderTime: form.reminderTime || null
+      reminderTime: form.reminderTime || null,
+      startDate: form.startDate || null,
+      endDate: form.endDate || null
     })
 
     if (response.data.hasInteractions) {
@@ -124,6 +128,17 @@ onMounted(loadMedications)
       <div class="field">
         <label for="reminderTime">Horário do lembrete</label>
         <input id="reminderTime" v-model="form.reminderTime" type="time" />
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="startDate">Data de início</label>
+          <input id="startDate" v-model="form.startDate" type="date" />
+        </div>
+        <div class="field">
+          <label for="endDate">Data de fim (opcional)</label>
+          <input id="endDate" v-model="form.endDate" type="date" />
+        </div>
       </div>
 
       <div class="form-actions">

@@ -2,6 +2,8 @@ package com.medtrack.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 
+import java.time.LocalDate;
+
 public record UserMedicationRequest(
         @NotNull(message = "ID do medicamento é obrigatório")
         Long medicationId,
@@ -12,5 +14,9 @@ public record UserMedicationRequest(
 
         String frequencyUnit,
 
-        String reminderTime
+        String reminderTime,
+
+        LocalDate startDate,
+
+        LocalDate endDate
 ) {}

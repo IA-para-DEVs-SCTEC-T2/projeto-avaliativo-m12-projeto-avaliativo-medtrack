@@ -44,4 +44,19 @@ public class UserMedicationController {
         userMedicationService.removeMedication(auth.getName(), id);
         return ResponseEntity.noContent().build();
     }
+
+    @PutMapping("/{id}")
+    @Operation(summary = "Editar medicamento", description = "Atualiza dosagem, frequência, horário e datas")
+    public ResponseEntity<UserMedicationResponse> updateMedication(
+            Authentication auth,
+            @PathVariable Long id,
+            @Valid @RequestBody UserMedicationRequest request) {
+        return ResponseEntity.ok(userMedicationService.updateMedication(auth.getName(), id, request));
+    }
+
+    @PatchMapping("/{id}/deactivate")
+    @Operation(summary = "Inativar medicamento", description = "Define data de fim como agora, cessando lembretes")
+    public ResponseEntity<UserMedicationResponse> deactivateMedication(Authentication auth, @PathVariable Long id) {
+        return ResponseEntity.ok(userMedicationService.deactivateMedication(auth.getName(), id));
+    }
 }
