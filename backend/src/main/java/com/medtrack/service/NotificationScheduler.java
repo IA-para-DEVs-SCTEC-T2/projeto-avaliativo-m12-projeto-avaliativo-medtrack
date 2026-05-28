@@ -31,6 +31,7 @@ public class NotificationScheduler {
         }
 
         LocalTime now = LocalTime.now().withSecond(0).withNano(0);
+        java.time.LocalDate today = java.time.LocalDate.now();
         List<UserMedication> allMedications = userMedicationRepository.findAll();
 
         List<UserMedication> dueReminders = allMedications.stream()
@@ -38,6 +39,7 @@ public class NotificationScheduler {
                 .filter(um -> um.getReminderTime().getHour() == now.getHour()
                         && um.getReminderTime().getMinute() == now.getMinute())
                 .filter(um -> um.getUser().getActive())
+                .filter(um -> isWithinTreatmentPeriod(um, today))
                 .toList();
 
         if (!dueReminders.isEmpty()) {
@@ -51,6 +53,16 @@ public class NotificationScheduler {
                     um.getDosage()
             );
         }
+    }
+
+    private boolean isWithinTreatmentPeriod(UserMedication um, java.time.LocalDate today) {
+        if (um.getStartDate() != null && today.isBefore(um.getStartDate().toLocalDate())) {
+            return false;
+        }
+        if (um.getEndDate() != null && today.isAfter(um.getEndDate().toLocalDate())) {
+            return false;
+        }
+        return true;
     }
 
     private boolean isNotificationEnabled() {
