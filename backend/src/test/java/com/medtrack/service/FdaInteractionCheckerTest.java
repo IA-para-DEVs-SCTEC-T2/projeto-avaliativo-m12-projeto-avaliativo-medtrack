@@ -68,7 +68,7 @@ class FdaInteractionCheckerTest {
     @DisplayName("Deve retornar vazio quando FdaApiClient retorna Optional.empty (flag desligada / erro)")
     void shouldReturnEmptyWhenFdaClientReturnsEmpty() {
         when(medicationRepository.findById(1L)).thenReturn(Optional.of(varfarina));
-        when(fdaApiClient.searchDrugLabel("Varfarina")).thenReturn(Optional.empty());
+        when(fdaApiClient.searchDrugLabel("Warfarin")).thenReturn(Optional.empty());
 
         List<Interaction> result = checker.findInteractions(1L);
 
@@ -79,7 +79,7 @@ class FdaInteractionCheckerTest {
     @DisplayName("Deve mapear interação quando FDA descreve match com outro medicamento do catálogo")
     void shouldMapInteractionWhenFdaMentionsKnownMedication() {
         when(medicationRepository.findById(1L)).thenReturn(Optional.of(varfarina));
-        when(fdaApiClient.searchDrugLabel("Varfarina"))
+        when(fdaApiClient.searchDrugLabel("Warfarin"))
                 .thenReturn(Optional.of(buildFdaResponse(List.of(
                         "Concomitant use of Aspirina increases bleeding risk."
                 ))));
@@ -100,7 +100,7 @@ class FdaInteractionCheckerTest {
     @DisplayName("Deve fazer matching também pelo princípio ativo")
     void shouldMatchByActiveIngredient() {
         when(medicationRepository.findById(1L)).thenReturn(Optional.of(varfarina));
-        when(fdaApiClient.searchDrugLabel("Varfarina"))
+        when(fdaApiClient.searchDrugLabel("Warfarin"))
                 .thenReturn(Optional.of(buildFdaResponse(List.of(
                         "Avoid combination with aspirin (acetylsalicylic acid)."
                 ))));
@@ -116,7 +116,7 @@ class FdaInteractionCheckerTest {
     @DisplayName("Não deve incluir o próprio medicamento como par")
     void shouldNotMatchSelf() {
         when(medicationRepository.findById(1L)).thenReturn(Optional.of(varfarina));
-        when(fdaApiClient.searchDrugLabel("Varfarina"))
+        when(fdaApiClient.searchDrugLabel("Warfarin"))
                 .thenReturn(Optional.of(buildFdaResponse(List.of("Varfarina interactions described here."))));
         when(medicationRepository.findAll()).thenReturn(List.of(varfarina));
 
@@ -129,7 +129,7 @@ class FdaInteractionCheckerTest {
     @DisplayName("Deve retornar vazio quando FDA não cita nenhum medicamento conhecido do catálogo")
     void shouldReturnEmptyWhenNoMatchInCatalog() {
         when(medicationRepository.findById(1L)).thenReturn(Optional.of(varfarina));
-        when(fdaApiClient.searchDrugLabel("Varfarina"))
+        when(fdaApiClient.searchDrugLabel("Warfarin"))
                 .thenReturn(Optional.of(buildFdaResponse(List.of("Caution with NSAIDs and SSRIs."))));
         when(medicationRepository.findAll()).thenReturn(List.of(varfarina, paracetamol));
 
@@ -143,7 +143,7 @@ class FdaInteractionCheckerTest {
     void shouldTruncateLongDescriptions() {
         String hugeDescription = "Aspirina " + "x".repeat(800);
         when(medicationRepository.findById(1L)).thenReturn(Optional.of(varfarina));
-        when(fdaApiClient.searchDrugLabel("Varfarina"))
+        when(fdaApiClient.searchDrugLabel("Warfarin"))
                 .thenReturn(Optional.of(buildFdaResponse(List.of(hugeDescription))));
         when(medicationRepository.findAll()).thenReturn(List.of(varfarina, aspirina));
 
