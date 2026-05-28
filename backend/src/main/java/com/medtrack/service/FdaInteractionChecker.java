@@ -44,7 +44,12 @@ public class FdaInteractionChecker implements InteractionChecker {
         }
         Medication medication = source.get();
 
-        Optional<FdaSearchResponse> fdaResponse = fdaApiClient.searchDrugLabel(medication.getName());
+        // Buscar na FDA pelo princípio ativo (em inglês) primeiro, fallback para o nome
+        String searchTerm = (medication.getActiveIngredient() != null && !medication.getActiveIngredient().isBlank())
+                ? medication.getActiveIngredient()
+                : medication.getName();
+
+        Optional<FdaSearchResponse> fdaResponse = fdaApiClient.searchDrugLabel(searchTerm);
         if (fdaResponse.isEmpty()) {
             return List.of();
         }
