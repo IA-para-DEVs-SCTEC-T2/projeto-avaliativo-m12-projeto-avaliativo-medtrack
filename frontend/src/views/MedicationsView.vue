@@ -124,7 +124,7 @@ onMounted(loadMedications)
     </div>
 
     <div v-else class="grid-cards">
-      <article v-for="med in medications" :key="med.id" class="card medication-card" :class="{ 'card-inactive': !med.active }">
+      <article v-for="med in medications" :key="med.id" class="card medication-card" :class="{ 'card-inactive': !med.active, 'card-editing': editing === med.id }">
 
         <!-- Modo visualização -->
         <template v-if="editing !== med.id">
@@ -225,6 +225,10 @@ onMounted(loadMedications)
 .card-inactive {
   opacity: 0.65;
   border-left: 3px solid var(--color-text-muted);
+}
+
+.card-editing {
+  grid-column: 1 / -1;
 }
 
 .card-actions {
