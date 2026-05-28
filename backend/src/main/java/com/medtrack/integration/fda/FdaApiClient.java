@@ -39,11 +39,22 @@ public class FdaApiClient {
                     .baseUrl(baseUrl)
                     .build();
 
-            FdaSearchResponse response = client.get()
-                    .uri("/drug/label.json?search=openfda.brand_name:\"{drugName}\"&limit=1",
-                            drugName)
+            String json = client.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path("/drug/label.json")
+                            .queryParam("search", "openfda.substance_name:\"" + drugName + "\"+openfda.generic_name:\"" + drugName + "\"")
+                            .queryParam("limit", "1")
+                            .build())
                     .retrieve()
-                    .body(FdaSearchResponse.class);
+                    .body(String.class);
+
+            if (json == null || json.isBlank()) {
+                return Optional.empty();
+            }
+
+            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+            mapper.configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            FdaSearchResponse response = mapper.readValue(json, FdaSearchResponse.class);
 
             return Optional.ofNullable(response);
         } catch (Exception e) {

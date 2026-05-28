@@ -199,3 +199,69 @@ A geração entregou o esqueleto correto. Ajustes manuais aplicados:
 - **Ajustado:** todos os pontos da tabela acima.
 - **Rejeitado:** sugestão da IA de adicionar refresh token rotation — fora do escopo
   do MVP (registrado em `Melhorias Futuras` do README).
+
+
+---
+
+## Ciclo 4 — FdaInteractionChecker (FDA como fonte adicional de interações)
+
+**Data:** 2026-05-27
+**Issue:** [#37 — feat(backend): plugar openFDA como fonte adicional de interações](https://github.com/IA-para-DEVs-SCTEC-T2/projeto-avaliativo-medtrack/issues/37)
+**Padrão de prompting:** Role-based + Chain of Thought
+**Ferramenta:** Kiro
+
+> Ciclo é backend, mas mantenho a anotação aqui porque dá continuidade direta ao trabalho do Ciclo 3 (frontend MVP) — agora a flag de configuração que aparece em `SystemConfigView` ganha efeito real.
+
+### Contexto
+
+O ADR-002 prometia FDA como camada adicional ativável, e a refatoração SOLID (PR #25) já tinha exposto o `InteractionService` recebendo `List<InteractionChecker>`. Faltava o segundo implementador. Sem ele, a flag `FDA_INTEGRATION_ENABLED` só blindava o método `searchDrugLabel` — que ninguém chamava no fluxo real.
+
+### Prompt Inicial
+
+```
+Você é um desenvolvedor backend Java sênior, focado em design por contratos.
+
+Implemente FdaInteractionChecker que agregue interações vindas da Drug Label API
+ao service InteractionService através do Strategy Pattern já existente.
+
+Requisitos:
+- @Component implementando InteractionChecker.
+- findInteractions(medicationId): busca o nome no MedicationRepository, chama
+  FdaApiClient.searchDrugLabel, extrai drug_interactions e faz matching contra
+  o catálogo local (name + activeIngredient, case-insensitive).
+- Interações em memória, source="FDA", severidade default MODERATE, descrição
+  truncada a 500 chars.
+- Retornar lista vazia se: medicamento não existe, FDA Optional.empty, FDA não
+  cita nenhum item do catálogo.
+- Não persiste nada — InteractionService apenas agrega.
+- Cobertura unitária com Mockito: getSource, medicamento inexistente, flag
+  desligada (Optional.empty), match por nome, match por active_ingredient,
+  exclusão do próprio medicamento, ausência de match no catálogo, truncamento.
+
+Não inventar campos: respeitar o que já existe em FdaSearchResponse.
+```
+
+### Saída e ajustes
+
+| Item | Razão |
+|------|-------|
+| `mentions(haystackLower, candidate)` separado do loop principal | Legibilidade e isolamento da regra de matching |
+| `truncate` com `length() <= max` antes de cortar | Evitar `StringIndexOutOfBoundsException` quando description é exatamente o tamanho máximo |
+| `findAll()` no checker (não no service) | Local Checker já busca por ID; manter cada checker independente para preservar OCP |
+| Excluir o próprio `medicationId` do catálogo no loop | Sem isso, "Varfarina interactions described here" causaria self-match |
+| Severidade `MODERATE` default | Drug Label API não tem severidade; documentado em ADR-002 |
+
+### Decisões técnicas
+
+| Decisão | Justificativa |
+|---------|---------------|
+| Não persistir interações da FDA | Evita cache stale e duplicação. A FDA pode atualizar bula e nossa base ficaria divergente. |
+| Matching por substring case-insensitive | Suficiente para MVP. Risco de falso positivo aceitável dado que o usuário sempre vê o `source` e a `description`. |
+| `Severity.MODERATE` default | Conservador. Subestimar é menos perigoso que superestimar (usuário ignora severo demais). |
+| Tolerância a falha total na FDA | `FdaApiClient` já retorna `Optional.empty` em qualquer erro/timeout. O service também pega exceção do checker e segue com os outros. Failure does not propagate. |
+
+### Avaliação crítica
+
+- **Aceito:** estrutura por Strategy, matching por nome + active_ingredient, agregação no service.
+- **Ajustado:** todos os pontos da tabela acima.
+- **Rejeitado:** sugestão de cachear respostas da FDA com `@Cacheable` — desnecessário no MVP, ficou registrado em "Melhorias Futuras".
