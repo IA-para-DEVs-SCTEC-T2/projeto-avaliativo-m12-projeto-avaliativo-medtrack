@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalTime;
 import java.util.List;
@@ -25,6 +26,7 @@ public class NotificationScheduler {
      * Verifica se o horário atual (HH:mm) coincide com o reminder_time de algum medicamento.
      */
     @Scheduled(cron = "0 * * * * *")
+    @Transactional(readOnly = true)
     public void checkAndSendReminders() {
         if (!isNotificationEnabled()) {
             return;
