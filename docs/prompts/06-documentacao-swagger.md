@@ -3,7 +3,7 @@
 **Etapa:** Geração de documentação automática da API  
 **Padrão de prompting:** Role-based  
 **Ferramenta:** Claude (Anthropic) / Kiro (AWS)  
-**Data:** 2025-05-25
+**Data:** 2026-05-25
 
 ---
 

@@ -3,7 +3,7 @@
 **Etapa:** Configuração de integração contínua e entrega contínua  
 **Padrão de prompting:** Role-based + Chain of Thought  
 **Ferramenta:** Claude (Anthropic) / Kiro (AWS)  
-**Data:** 2025-01-XX
+**Data:** 2026-05-25
 
 ---
 

@@ -3,7 +3,7 @@
 **Etapa:** Geração de testes automatizados  
 **Padrão de prompting:** Few-shot  
 **Ferramenta:** Claude (Anthropic) / Kiro (AWS)  
-**Data:** 2025-05-25
+**Data:** 2026-05-25
 
 ---
 
