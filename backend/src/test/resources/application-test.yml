@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:medtrack_test}
+    username: ${DB_USER:medtrack_user}
+    password: ${DB_PASSWORD:test_password}
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+
+  flyway:
+    enabled: false
+
+  mail:
+    host: localhost
+    port: 1025

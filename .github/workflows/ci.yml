@@ -1,0 +1,140 @@
+name: MedTrack CI
+
+on:
+  push:
+    branches: [ main, develop, feature/**, docs/** ]
+  pull_request:
+    branches: [ develop ]
+
+jobs:
+  backend:
+    name: Backend — Lint & Tests
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: medtrack_test
+          POSTGRES_USER: medtrack_user
+          POSTGRES_PASSWORD: test_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check if backend exists
+        id: check-backend
+        run: |
+          if [ -f "./backend/pom.xml" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "⏭️ Backend ainda não inicializado — pulando checks"
+          fi
+
+      - name: Setup Java 21
+        if: steps.check-backend.outputs.exists == 'true'
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Lint — Checkstyle
+        if: steps.check-backend.outputs.exists == 'true'
+        working-directory: ./backend
+        continue-on-error: true
+        run: mvn checkstyle:check --no-transfer-progress
+
+      - name: Run Tests
+        if: steps.check-backend.outputs.exists == 'true'
+        working-directory: ./backend
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_NAME: medtrack_test
+          DB_USER: medtrack_user
+          DB_PASSWORD: test_password
+          JWT_SECRET: test-secret-key-for-ci-only-not-real-64chars-padding-here
+          JWT_EXPIRATION_MS: 86400000
+          MAIL_HOST: localhost
+          MAIL_PORT: 1025
+          MAIL_USERNAME: test
+          MAIL_PASSWORD: test
+          FDA_API_BASE_URL: https://api.fda.gov
+          ADMIN_DEFAULT_PASSWORD: AdminTest@123
+        run: mvn test --no-transfer-progress
+
+      - name: Build
+        if: steps.check-backend.outputs.exists == 'true'
+        working-directory: ./backend
+        run: mvn package -DskipTests --no-transfer-progress
+
+  frontend:
+    name: Frontend — Lint & Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check if frontend exists
+        id: check-frontend
+        run: |
+          if [ -f "./frontend/package.json" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "⏭️ Frontend ainda não inicializado — pulando checks"
+          fi
+
+      - name: Setup Node.js
+        if: steps.check-frontend.outputs.exists == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Cache npm dependencies
+        if: steps.check-frontend.outputs.exists == 'true'
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('frontend/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
+      - name: Install dependencies
+        if: steps.check-frontend.outputs.exists == 'true'
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Lint — ESLint
+        if: steps.check-frontend.outputs.exists == 'true'
+        working-directory: ./frontend
+        run: npm run lint
+
+      - name: Build
+        if: steps.check-frontend.outputs.exists == 'true'
+        working-directory: ./frontend
+        env:
+          VITE_API_BASE_URL: http://localhost:8080
+        run: npm run build
+
+  security-check:
+    name: Security — No secrets in code
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check for .env files committed
+        run: |
+          if git ls-files | grep -E '^\.env$'; then
+            echo "❌ Arquivo .env encontrado no repositório!"
+            exit 1
+          fi
+          echo "✅ Nenhum arquivo .env no repositório"
