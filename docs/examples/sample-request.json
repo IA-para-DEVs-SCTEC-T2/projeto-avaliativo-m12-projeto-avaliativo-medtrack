@@ -1,0 +1,44 @@
+{
+  "cenario_1_registro": {
+    "descricao": "Cadastro de novo usuário",
+    "endpoint": "POST /auth/register",
+    "request": {
+      "email": "paciente@email.com",
+      "password": "SenhaSegura@123"
+    }
+  },
+  "cenario_2_login": {
+    "descricao": "Login do usuário cadastrado",
+    "endpoint": "POST /auth/login",
+    "request": {
+      "email": "paciente@email.com",
+      "password": "SenhaSegura@123"
+    }
+  },
+  "cenario_3_adicionar_medicamento": {
+    "descricao": "Adicionar Varfarina ao perfil do usuário (com verificação de interações)",
+    "endpoint": "POST /user-medications",
+    "headers": {
+      "Authorization": "Bearer <token_jwt>"
+    },
+    "request": {
+      "medicationId": 1,
+      "dosage": "5mg",
+      "frequencyValue": 1,
+      "frequencyUnit": "DAILY",
+      "reminderTime": "08:00",
+      "startDate": "2026-05-28",
+      "endDate": "2026-08-28"
+    }
+  },
+  "cenario_4_toggle_fda": {
+    "descricao": "Admin ativa integração FDA",
+    "endpoint": "POST /admin/fda/toggle",
+    "headers": {
+      "Authorization": "Bearer <token_jwt_admin>"
+    },
+    "request": {
+      "enabled": true
+    }
+  }
+}

@@ -3,7 +3,7 @@
 **Etapa:** Avaliação e correção de saída gerada  
 **Padrão de prompting:** Iterativo com feedback explícito  
 **Ferramenta:** Kiro (AWS)  
-**Data:** [preencher]
+**Data:** 2026-05-25
 
 ---
 

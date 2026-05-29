@@ -1,0 +1,93 @@
+{
+  "cenario_1_registro": {
+    "status": 201,
+    "response": {
+      "token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJwYWNpZW50ZUBlbWFpbC5jb20iLCJyb2xlIjoiVVNFUiIsImlhdCI6MTcxNjg1MDAwMCwiZXhwIjoxNzE2OTM2NDAwfQ...",
+      "email": "paciente@email.com",
+      "role": "USER"
+    }
+  },
+  "cenario_2_login": {
+    "status": 200,
+    "response": {
+      "token": "eyJhbGciOiJIUzUxMiJ9...",
+      "email": "paciente@email.com",
+      "role": "USER"
+    }
+  },
+  "cenario_3_adicionar_medicamento_com_interacao": {
+    "status": 201,
+    "descricao": "Usuário já tinha Aspirina cadastrada — sistema detecta interação SEVERE",
+    "response": {
+      "medication": {
+        "id": 42,
+        "medicationId": 1,
+        "medicationName": "Varfarina",
+        "dosage": "5mg",
+        "frequencyValue": 1,
+        "frequencyUnit": "DAILY",
+        "reminderTime": "08:00:00",
+        "startDate": "2026-05-28",
+        "endDate": "2026-08-28",
+        "active": true
+      },
+      "interactions": [
+        {
+          "id": 1,
+          "medicationAName": "Varfarina",
+          "medicationBName": "Aspirina",
+          "severity": "SEVERE",
+          "description": "Risco aumentado de sangramento. Combinação pode causar hemorragia grave.",
+          "source": "LOCAL"
+        },
+        {
+          "id": null,
+          "medicationAName": "Varfarina",
+          "medicationBName": "Aspirina",
+          "severity": "MODERATE",
+          "description": "Concomitant use of aspirin increases bleeding risk...",
+          "source": "FDA"
+        }
+      ],
+      "hasInteractions": true
+    }
+  },
+  "cenario_4_toggle_fda": {
+    "status": 200,
+    "response": {
+      "fdaEnabled": true,
+      "message": "Integração FDA ativada"
+    }
+  },
+  "cenario_5_listar_interacoes_com_fda_ativa": {
+    "endpoint": "GET /interactions/medication/1",
+    "status": 200,
+    "descricao": "Retorna interações LOCAL + FDA agregadas para Varfarina",
+    "response": [
+      {
+        "id": 1,
+        "medicationAName": "Varfarina",
+        "medicationBName": "Aspirina",
+        "severity": "SEVERE",
+        "description": "Risco aumentado de sangramento. Combinação pode causar hemorragia grave.",
+        "source": "LOCAL"
+      },
+      {
+        "id": 2,
+        "medicationAName": "Varfarina",
+        "medicationBName": "Ibuprofeno",
+        "severity": "SEVERE",
+        "description": "AINEs aumentam risco de sangramento com anticoagulantes.",
+        "source": "LOCAL"
+      },
+      {
+        "id": null,
+        "medicationAName": "Varfarina",
+        "medicationBName": "Clopidogrel",
+        "severity": "MODERATE",
+        "description": "Concomitant use increases bleeding risk...",
+        "source": "FDA"
+      }
+    ]
+  }
+}
