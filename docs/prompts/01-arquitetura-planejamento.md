@@ -3,7 +3,7 @@
 **Etapa:** Especificação e planejamento arquitetural  
 **Padrão de prompting:** Chain of Thought + Role-based  
 **Ferramenta:** Claude (Anthropic) / Kiro (AWS)  
-**Data:** 2025-05-25
+**Data:** 2026-05-25
 
 ---
 
