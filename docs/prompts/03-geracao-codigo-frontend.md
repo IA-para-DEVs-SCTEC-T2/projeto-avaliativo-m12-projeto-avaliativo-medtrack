@@ -3,7 +3,7 @@
 **Etapa:** Geração de código com IA — fluxo do usuário  
 **Padrão de prompting:** Role-based + Few-shot  
 **Ferramenta:** Claude (Anthropic) / Kiro (AWS)  
-**Data:** 2025-05-25
+**Data:** 2026-05-25
 
 ---
 
